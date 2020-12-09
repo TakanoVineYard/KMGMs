@@ -63,7 +63,7 @@ public class KMHH_TimeManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Time.timeScale = 1.0f;
+        Time.timeScale = 0.25f;
         questionNumOfTimes = 0;
 
         upDateGameTimerObj = GameObject.Find("ui_GameTimer");　//ゲーム時間経過用オブジェクト拾ってくるぜ  
@@ -228,33 +228,31 @@ public class KMHH_TimeManager : MonoBehaviour
 
 //出題状態のとき
 
-            if (questionStatus == true){
+            if ((questionStatus == true)&&(breakQuestion == false)){
                 
                 answerTime += Time.deltaTime; //答えるまでの時間を更新
 
                 if(answerTime > kmhhQuestionSpan) //出題状態で、出題制限時間超過したら
                 {
-                    Debug.Log(answerTime +" >" + kmhhQuestionSpan);
                     answerTime = 0.0f;
                     questionStatus = false; //出題状態OFF
                     breakQuestion = true; //出題状態を解除して、アイドルモーションに戻す
                     giveQuestion = false;
+                    
+                    Debug.Log(answerTime +" >" + kmhhQuestionSpan);
                 }
             }
 
 
 //出題状態じゃないとき
-            if (questionStatus == false){
+            if ((questionStatus == false)&&(giveQuestion == false)){
                 
-                answerTime += Time.deltaTime; //答えるまでの時間を更新    
+                answerTime += Time.deltaTime; //答えるまでの時間を更新
+
                 if(answerTime > kmhhIdleSpan){//非出題状態で、非出題制限時間超過したら
-
-
-                    Debug.Log(answerTime +" >" + kmhhIdleSpan);
-
-                    questionStatus = false; //出題状態OFF
-                    giveQuestion = true; //出題状態ON
                     answerTime = 0.0f;
+                    giveQuestion = true; //出題状態ON
+                    Debug.Log(answerTime +" >" + kmhhIdleSpan);
                 }    
             }
         }
