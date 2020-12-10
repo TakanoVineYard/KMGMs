@@ -13,9 +13,8 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     [SerializeField] static Animator KMHH_CharaAnimator; //キャラアニメーター
     public static int randomNum = 0; //ランダムでポーズ選択用 int
     public static string NumID;    //↑ランダム数値を文字変更
-    public bool idleflag = false;
 
-    KmhhCharacterInfoAll kmhhCInfoAll = new KmhhCharacterInfoAll();　//キャラ情報全部クラスから継承
+    public static KmhhCharacterInfoAll kmhhCInfoAll = new KmhhCharacterInfoAll();　//キャラ情報全部クラスから継承
 
 ////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -84,7 +83,7 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
         KMHH_CharaAnimator.CrossFadeInFixedTime("armature|anm_kmhh_" +(NumID.PadLeft(3,'0'))+"_lp", 0.25f);
 
 
-        Debug.Log("出題IDナンバー:"+NumID.PadLeft(3,'0'));
+        Debug.Log("出題 IDナンバー:"+NumID.PadLeft(3,'0'));
         //1秒待つ
         //yield return new WaitForSeconds(0f);
 

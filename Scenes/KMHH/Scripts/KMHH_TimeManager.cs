@@ -20,15 +20,15 @@ public class KMHH_TimeManager : MonoBehaviour
     public static float gameTimePast = 0.0f; //時間の経過
     public static int  gameTimePastInt = 0;  //時間の経過のInt化
     public static float gameFinishTime = 0.0f; //ゲーム終了時の時間を記録
-    float kmhhQuestionSpan  = 5.0f;  //出題時間のスパン
-    float kmhhIdleSpan  = 2.0f;  //　キャラクターの待機状態のスパン
+    float kmhhQuestionSpan  = 3.0f;  //出題時間のスパン
+    float kmhhIdleSpan  = 1.0f;  //　キャラクターの待機状態のスパン
     public float answerTime = 0.0f; //回答時のカレントタイム。timePastとの差分で答えるまでにかかった時間を取る
 
     public float stopWatchQuestionCurrentTime = 0.0f; //出題時とアイドル時の時間記録
 
     public static bool gameStart = false; //ゲームがスタートしているかの判定
     public static bool gameFinish = false; //ゲームが終了しているかの判定
-    public bool questionStatus = false; //出題状態かどうか
+    public  static bool questionStatus = false; //出題状態かどうか
 
     public bool giveQuestion = false; //出題フラグ
     public bool breakQuestion = true; //休憩フラグ
@@ -63,7 +63,7 @@ public class KMHH_TimeManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Time.timeScale = 0.25f;
+        Time.timeScale = 0.75f;
         questionNumOfTimes = 0;
 
         upDateGameTimerObj = GameObject.Find("ui_GameTimer");　//ゲーム時間経過用オブジェクト拾ってくるぜ  
@@ -99,7 +99,7 @@ public class KMHH_TimeManager : MonoBehaviour
     /// </summary>
     /// <returns></returns>   
     // Update is called once per frame
-    public void FixedUpdate()
+    public void Update()
     {
 
 
@@ -342,4 +342,7 @@ public class KMHH_TimeManager : MonoBehaviour
 
     }
 
+    public static bool getQuestionStatus (){
+        return questionStatus;
+    }
 }

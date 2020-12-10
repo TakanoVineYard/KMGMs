@@ -3,9 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using static KMHH_TimeManager; //時間管理スクリプトを使う
+using static KMHH_CharaAnimationManager;
 
 public class KMHH_PlayerInputManager : MonoBehaviour
 {
+    //ボディパーツ配列
+    public static string[] setRandomBodyPart = {"eye","hand_LSide","hand_RSide","leg_LSide","leg_RSide"};
+    public int numOfBodyPart = 0; //　↑の変数の番号
+
+    public string suffixBodyPartsName;　//末尾にいれるパーツ
+
+    public Dictionary<string, int> bodyPartDic = new Dictionary<string, int>();
+
+
 
     /// <summary>
     /// 左ボタン押されたときの成否判断処理
@@ -13,6 +23,25 @@ public class KMHH_PlayerInputManager : MonoBehaviour
     /// <returns></returns>   
     public void JudgeL()   //外から左ボタンが押されたときに実行
     {
+        //　セットされてるパーツがどれか
+        suffixBodyPartsName = setRandomBodyPart[numOfBodyPart];
+        
+        //Random数値のポーズの、セットされてるボディパーツに該当する結果が　L　かどうか
+
+
+        if (KMHH_CharaAnimationManager.kmhhCInfoAll.KmhhCharaPoseArray[1].hand_LSide == "L"){
+
+            Debug.Log("せいかい");
+        }
+
+            if(KMHH_TimeManager.getQuestionStatus()){
+                Debug.Log("ひだり");
+            }
+            else{
+                Debug.Log("受け付けませーん");
+            }
+
+
  /*/★       if(KMHH_TimeManager.giveQuestionTime)//出題状態だったら
        {
  //★
@@ -31,9 +60,7 @@ public class KMHH_PlayerInputManager : MonoBehaviour
 
 
         //出題状態じゃなかったら
-
-        Debug.Log("ひだり");
-       // if (KMHH_TimeManager.questionStatus == false) //出題状態じゃない限り、何も実行しないで戻る
+       // if (KMHH_TimeManager.getQuestionStatus() == false) //出題状態じゃない限り、何も実行しないで戻る
        // {
             //Debug.Log("りたーん");
        //     return;
@@ -54,32 +81,86 @@ public class KMHH_PlayerInputManager : MonoBehaviour
     }
     public void JudgeUL()   //外から左ボタンが押されたときに実行
     {
-        Debug.Log("ひだりうえ");
+        
+
+        if (KMHH_CharaAnimationManager.kmhhCInfoAll.KmhhCharaPoseArray[1].hand_LSide == "UL"){
+
+        }
+        else{
+            Debug.Log("ふせいかい");
+        }
+
+            if(KMHH_TimeManager.getQuestionStatus()){
+                Debug.Log("ひだりうえ");
+            }
+            else{
+                Debug.Log("受け付けませーん");
+            }
     } 
     public void JudgeDL()   //外から左ボタンが押されたときに実行
     {
-        Debug.Log("ひだりした");
+            if(KMHH_TimeManager.getQuestionStatus()){
+                Debug.Log("ひだりした");
+            }
+            else{
+                Debug.Log("受け付けませーん");
+            }
     }  
     public void JudgeR()   //外から左ボタンが押されたときに実行
     {
-        Debug.Log("みぎ");
+            if(KMHH_TimeManager.getQuestionStatus()){
+                Debug.Log("みぎ");
+            }
+            else{
+                Debug.Log("受け付けませーん");
+            }
     }  
     public void JudgeUR()   //外から左ボタンが押されたときに実行
     {
-        Debug.Log("みぎうえ");
+            if(KMHH_TimeManager.getQuestionStatus()){
+                Debug.Log("みぎうえ");
+            }
+            else{
+                Debug.Log("受け付けませーん");
+            }
     }  
     public void JudgeDR()   //外から左ボタンが押されたときに実行
     {
-        Debug.Log("みぎした");
+            if(KMHH_TimeManager.getQuestionStatus()){
+                Debug.Log("みぎした");
+            }
+            else{
+                Debug.Log("受け付けませーん");
+            }
     }  
     public void JudgeU()   //外から左ボタンが押されたときに実行
     {
-        Debug.Log("うえ");
+            if(KMHH_TimeManager.getQuestionStatus()){
+                Debug.Log("うえ");
+            }
+            else{
+                Debug.Log("受け付けませーん");
+            }
     }  
     public void JudgeD()   //外から左ボタンが押されたときに実行
     {
-        Debug.Log("した");
-    }  
+            if(KMHH_TimeManager.getQuestionStatus()){
+                Debug.Log("した");
+            }
+            else{
+                Debug.Log("受け付けませーん");
+            }
+    }
+
+
+    /// <summary>
+    ///ボディパーツのランダム選択
+    /// </summary>
+    /// <returns>配列に入れる数字</returns> 
+
+public static int SetRandomBodyPart(){
+    return(UnityEngine.Random.Range(0, 4));
+}
 
 
 
