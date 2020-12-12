@@ -6,15 +6,28 @@ using UnityEngine.UI; //テキスト使うなら必要
 using System.IO;
 using System.Collections.Generic;
 using System.Runtime;
+using System;  //enumつかう
 
 public class KMHH_CharaAnimationManager : MonoBehaviour
 {
     public GameObject KMHH_CharaObj;
-    [SerializeField] static Animator KMHH_CharaAnimator; //キャラアニメーター
-    public static int randomNum = 0; //ランダムでポーズ選択用 int
+    [SerializeField] public static Animator KMHH_CharaAnimator; //キャラアニメーター
+    public static int randomPoseNum = 0; //ランダムでポーズ選択用 int
     public static string NumID;    //↑ランダム数値を文字変更
 
     public static KmhhCharacterInfoAll kmhhCInfoAll = new KmhhCharacterInfoAll();　//キャラ情報全部クラスから継承
+
+    //ボディパーツ配列
+    public static string[] setRandomBodyPart = {"eye","hand_LSide","hand_RSide","leg_LSide","leg_RSide"};
+    public static int randomBodyPartNum;
+    public static string selectedBodyParts;
+    public static GameObject bodyPartsObj_Debug;
+    public static Text bodyPartsText_Debug;
+
+    public static string resultCollectAnser; //正解パーツ入れ
+
+    public static GameObject partsInfoTextObj;
+    public static Text partsInfoText;
 
 ////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -39,17 +52,55 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
         GetCharaJSON();
         
         KMHH_CharaObj = GameObject.Find("ThendBear");
-
         KMHH_CharaAnimator = KMHH_CharaObj.GetComponentInChildren<Animator>();
-/*    
-        Debug.Log("id:"+ (kmhhCInfoAll.KmhhCharaPoseArray[randomNum].id).PadLeft(3,'0'));
-        Debug.Log("eye:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].eye);
-        Debug.Log("hand_LSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].hand_LSide);
-        Debug.Log("hand_RSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].hand_RSide);
-        Debug.Log("leg_LSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].leg_LSide);
-        Debug.Log("leg_RSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].leg_RSide);
-*/
+
+        bodyPartsObj_Debug = GameObject.Find("Debug_BodyParts");
+        bodyPartsText_Debug = bodyPartsObj_Debug.GetComponentInChildren<Text>();
+
+        partsInfoTextObj = GameObject.Find("Debug_PartsInfo");
+        partsInfoText = partsInfoTextObj.GetComponentInChildren<Text>();
+
     }
+
+    public void Update(){
+
+    }
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    ///アニメーションステートを変える
+    /// </summary>
+    /// <returns></returns> 
+    static void ChangeQuestionBodyParts()
+    {
+        randomBodyPartNum = UnityEngine.Random.Range(0, 4);　　//0～4用意した分でランダム数値取り出し
+
+/*
+        switch (randomBodyPartNum){
+        case 0:
+                    selectedBodyParts = "eye";
+        break;
+        case 1:
+                    selectedBodyParts = "hand_LSide";
+        break;
+        case 2:
+                    selectedBodyParts = "hand_RSide";
+        break;
+        case 3:
+                    selectedBodyParts = "leg_LSide";
+        break;
+        case 4:
+                    selectedBodyParts = "leg_RSide";
+        break;
+        }
+*/
+
+        bodyPartsText_Debug.text = "ぼでぃぱーつ選択待ち...";
+
+
+    }
+    
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -58,41 +109,59 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     /// <returns></returns> 
     public static void ChangeCharaState()
     {
-        randomNum = UnityEngine.Random.Range(0, 7);　　//0～用意した分でランダム数値取り出し
+        randomPoseNum = UnityEngine.Random.Range(0, 7);　　//0～用意した分でランダム数値取り出し
 
-/*      //情報テキスト更新
+      //情報テキスト更新
         partsInfoText.text = ("PartsInfo"+'\n'+
-            "id:"+ (kmhhCInfoAll.KmhhCharaPoseArray[randomNum].id).PadLeft(3,'0') +'\n'+
-            "eye:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].eye +'\n'+
-            "hand_LSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].hand_LSide +'\n'+
-            "hand_RSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].hand_RSide +'\n'+
-            "leg_LSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].leg_LSide +'\n'+
-            "leg_RSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomNum].leg_RSide
+            "id:"+ (kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].id).PadLeft(3,'0') +'\n'+
+            "eye:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].eye +'\n'+
+            "hand_LSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].hand_LSide +'\n'+
+            "hand_RSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].hand_RSide +'\n'+
+            "leg_LSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].leg_LSide +'\n'+
+            "leg_RSide:"+ kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].leg_RSide
             );
-*/
-        NumID = randomNum.ToString();　//作ったランダム数値を文字列化していれる
-//       Debug.Log("armature|anm_kmhh_" +(NumID.PadLeft(3,'0'))+"_in");
-//        Debug.Log("armature|anm_kmhh_" +(NumID.PadLeft(3,'0'))+"_lp");
-        //秒待つ
-        //yield return new WaitForSeconds(0.5f);
-        //Idle -> SampleAnimation1 に遷移
+
+        NumID = randomPoseNum.ToString();　//作ったランダム数値を文字列化していれる
+
         KMHH_CharaAnimator.CrossFadeInFixedTime("armature|anm_kmhh_" +(NumID.PadLeft(3,'0'))+"_in", 0.125f);
 
-        //秒待つ
-        //yield return  new WaitForSeconds(0.5f);
+        /*
+        inからlpに
+        */
+
         KMHH_CharaAnimator.CrossFadeInFixedTime("armature|anm_kmhh_" +(NumID.PadLeft(3,'0'))+"_lp", 0.25f);
 
 
         Debug.Log("出題 IDナンバー:"+NumID.PadLeft(3,'0'));
-        //1秒待つ
-        //yield return new WaitForSeconds(0f);
-
-        //SampleAnimation1 -> SampleAnimation2　に遷移
-
-
-        //_animator.CrossFadeInFixedTime("armature|anm_kmhh_000_lp", 0);
         
-        //Time.timeScale += 0.5f;
+        switch (randomBodyPartNum){
+        case 0:
+                    selectedBodyParts = "eye";
+                    resultCollectAnser = kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].eye;
+        break;
+        case 1:
+                    selectedBodyParts = "hand_LSide";
+                    resultCollectAnser = kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].hand_LSide;
+        break;
+        case 2:
+                    selectedBodyParts = "hand_RSide";
+                    resultCollectAnser = kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].hand_RSide;
+        break;
+        case 3:
+                    selectedBodyParts = "leg_LSide";
+                    resultCollectAnser = kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].leg_LSide;
+        break;
+        case 4:
+                    selectedBodyParts = "leg_RSide";
+                    resultCollectAnser = kmhhCInfoAll.KmhhCharaPoseArray[randomPoseNum].leg_RSide;
+        break;
+        }
+
+        bodyPartsText_Debug.text = "ぼでぃぱーつ"+"\n"+
+                                    randomBodyPartNum +"="+ selectedBodyParts +"\n"+
+                                    "正解方角は："+resultCollectAnser+"!!";
+
+
     }
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -102,15 +171,14 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     /// <returns></returns> 
     public static void  ChangeCharaStateToIdle()
     {
+        ChangeQuestionBodyParts();　//お題の体パーツを決める
+        
+        randomPoseNum = UnityEngine.Random.Range(0, 2);
 
-        randomNum = UnityEngine.Random.Range(0, 2);
-
-        NumID = randomNum.ToString();
+        NumID = randomPoseNum.ToString();
         Debug.Log("アイドルIDナンバー:"+NumID.PadLeft(3,'0'));
 
         KMHH_CharaAnimator.CrossFadeInFixedTime("armature|anm_kmhh_idle_" +(NumID.PadLeft(3,'0')), 0.25f);
-
-        //yield return new WaitForSeconds(0f);
 
         
     }
@@ -123,23 +191,6 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
 /*    public void Update()
     {
 
-        countTime += Time.deltaTime;
-
-        //Debug.Log(countTime);
-
-        if((countTime > idleSpan) && (idleflag == false)){
-            idleflag = !idleflag;
-            StartCoroutine("ChangeCharaState");
-            countTime = 0f;
-            
-            }
-        else if((countTime > span) && (idleflag == true)){
-            idleflag = !idleflag;
-            StartCoroutine("ChangeCharaStateToIdle");
-            countTime = 0f;
-        }
-        
-        countTimeText.text = countTime.ToString("f1");
 
     }*/
 ////////////////////////////////////////////////////////////////////
@@ -169,6 +220,7 @@ public class KmhhCharacterInfoAll
 {
     public KmhhCharaPoseInfo[] KmhhCharaPoseArray;
 }
+
 
 ////////////////////////////////////////////////////////////////////
 }
