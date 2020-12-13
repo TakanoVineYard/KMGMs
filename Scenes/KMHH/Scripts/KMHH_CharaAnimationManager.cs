@@ -7,7 +7,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Runtime;
 using System;  //enumつかう
-
+using static KMHH_TimeManager;
 public class KMHH_CharaAnimationManager : MonoBehaviour
 {
     public GameObject KMHH_CharaObj;
@@ -29,19 +29,15 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     public static GameObject partsInfoTextObj;
     public static Text partsInfoText;
 
-////////////////////////////////////////////////////////////////////
-    /// <summary>
-    ///JSONデータ　引っ張ってくる
-    /// </summary>
-    /// <returns></returns> 
-    public void GetCharaJSON() {
+    public static GameObject indicateBodyPartsSpeechBubble;
+    public static GameObject indicateBodyPartEye;
+    public static GameObject indicateBodyPartLsideHand;
+    public static GameObject indicateBodyPartRsideHand;
+    public static GameObject indicateBodyPartLsideLeg;
+    public static GameObject indicateBodyPartRsideLeg;
 
-        //ファイルのロード（ポーズ情報）
-        string jsonCharaData = File.ReadAllText(Application.dataPath + "/Resources/JSONData/KMHH_CharaPoseData.json");
 
-        //配列メンバ持ってるクラスの継承　
-        kmhhCInfoAll = JsonUtility.FromJson<KmhhCharacterInfoAll>(jsonCharaData);
-    }
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -49,8 +45,16 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     /// </summary>
     /// <returns></returns> 
     public void Start(){
+
         GetCharaJSON();
-        
+        indicateBodyPartsSpeechBubble = GameObject.Find("ui_KMHH_SpeechBubble");
+        indicateBodyPartEye = GameObject.Find("ui_BodyPart_Eye");
+        indicateBodyPartLsideHand = GameObject.Find("ui_BodyPart_LsideHand");
+        indicateBodyPartRsideHand = GameObject.Find("ui_BodyPart_RsideHand");
+        indicateBodyPartLsideLeg = GameObject.Find("ui_BodyPart_LsideLeg");
+        indicateBodyPartRsideLeg = GameObject.Find("ui_BodyPart_RsideLeg");
+
+
         KMHH_CharaObj = GameObject.Find("ThendBear");
         KMHH_CharaAnimator = KMHH_CharaObj.GetComponentInChildren<Animator>();
 
@@ -59,10 +63,6 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
 
         partsInfoTextObj = GameObject.Find("Debug_PartsInfo");
         partsInfoText = partsInfoTextObj.GetComponentInChildren<Text>();
-
-    }
-
-    public void Update(){
 
     }
 
@@ -75,32 +75,56 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     static void ChangeQuestionBodyParts()
     {
         randomBodyPartNum = UnityEngine.Random.Range(0, 4);　　//0～4用意した分でランダム数値取り出し
+        indicateBodyPartsSpeechBubble.SetActive(true); //　吹き出し出す
 
-/*
         switch (randomBodyPartNum){
         case 0:
                     selectedBodyParts = "eye";
+                    indicateBodyPartEye.SetActive(true);
         break;
         case 1:
                     selectedBodyParts = "hand_LSide";
+                    indicateBodyPartLsideHand.SetActive(true);
         break;
         case 2:
                     selectedBodyParts = "hand_RSide";
+                    indicateBodyPartRsideHand.SetActive(true);
         break;
         case 3:
                     selectedBodyParts = "leg_LSide";
+                    indicateBodyPartLsideLeg.SetActive(true);
         break;
         case 4:
                     selectedBodyParts = "leg_RSide";
+                    indicateBodyPartRsideLeg.SetActive(true);
         break;
         }
-*/
 
-        bodyPartsText_Debug.text = "ぼでぃぱーつ選択待ち...";
+
+        bodyPartsText_Debug.text = "ぼでぃぱーつ\n選択待ち...";
 
 
     }
-    
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    ///アニメーションステートを変える
+    /// </summary>
+    /// <returns></returns> 
+    public static void hideBodyParts()
+    {
+        indicateBodyPartsSpeechBubble.SetActive(true); //　吹き出し出す
+                    indicateBodyPartEye.SetActive(false);
+                    indicateBodyPartLsideHand.SetActive(false);
+                    indicateBodyPartRsideHand.SetActive(false);
+                    indicateBodyPartLsideLeg.SetActive(false);
+                    indicateBodyPartRsideLeg.SetActive(false);
+    }
+
+
+
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -109,6 +133,9 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     /// <returns></returns> 
     public static void ChangeCharaState()
     {
+
+         hideBodyParts();
+
         randomPoseNum = UnityEngine.Random.Range(0, 7);　　//0～用意した分でランダム数値取り出し
 
       //情報テキスト更新
@@ -132,7 +159,7 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
         KMHH_CharaAnimator.CrossFadeInFixedTime("armature|anm_kmhh_" +(NumID.PadLeft(3,'0'))+"_lp", 0.25f);
 
 
-        Debug.Log("出題 IDナンバー:"+NumID.PadLeft(3,'0'));
+        //Debug.Log("出題 IDナンバー:"+NumID.PadLeft(3,'0'));
         
         switch (randomBodyPartNum){
         case 0:
@@ -173,14 +200,47 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     {
         ChangeQuestionBodyParts();　//お題の体パーツを決める
         
-        randomPoseNum = UnityEngine.Random.Range(0, 2);
+        randomPoseNum = UnityEngine.Random.Range(0, 5);
 
         NumID = randomPoseNum.ToString();
-        Debug.Log("アイドルIDナンバー:"+NumID.PadLeft(3,'0'));
+        //Debug.Log("アイドルIDナンバー:"+NumID.PadLeft(3,'0'));
 
         KMHH_CharaAnimator.CrossFadeInFixedTime("armature|anm_kmhh_idle_" +(NumID.PadLeft(3,'0')), 0.25f);
 
         
+    }
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    ///アニメーションステートを変える 待機
+    /// </summary>
+    /// <returns></returns> 
+    public static void ChangeCharaStateToEmotion(bool anserResultEmo)
+    {
+        //Debug.Log("えも");
+
+        if(anserResultEmo){
+        KMHH_CharaAnimator.CrossFadeInFixedTime("armature|anm_kmhh_Emo_Excellent", 0.25f);
+        }
+        else{
+        KMHH_CharaAnimator.CrossFadeInFixedTime("armature|anm_kmhh_Emo_No", 0.25f);
+
+        }
+
+    }
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    ///アニメーションステートを変える 待機
+    /// </summary>
+    /// <returns></returns> 
+    public static void ChangeCharaStateToFinish()
+    {
+        //Debug.Log("ばいばい");
+        KMHH_CharaAnimator.CrossFadeInFixedTime("armature|anm_kmhh_Emo_Bye", 0.25f);
+   
+
     }
 ////////////////////////////////////////////////////////////////////   
 ////////////////////////////////////////////////////////////////////
@@ -188,11 +248,6 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     ///オンマウスで説明でる
     /// </summary>
     /// <returns></returns> 
-/*    public void Update()
-    {
-
-
-    }*/
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -223,4 +278,16 @@ public class KmhhCharacterInfoAll
 
 
 ////////////////////////////////////////////////////////////////////
+    /// <summary>
+    ///JSONデータ　引っ張ってくる
+    /// </summary>
+    /// <returns></returns> 
+    public void GetCharaJSON() {
+
+        //ファイルのロード（ポーズ情報）
+        string jsonCharaData = File.ReadAllText(Application.dataPath + "/Resources/JSONData/KMHH_CharaPoseData.json");
+
+        //配列メンバ持ってるクラスの継承　
+        kmhhCInfoAll = JsonUtility.FromJson<KmhhCharacterInfoAll>(jsonCharaData);
+    }
 }

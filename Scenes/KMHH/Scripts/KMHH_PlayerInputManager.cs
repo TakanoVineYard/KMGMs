@@ -6,6 +6,7 @@ using TMPro; //TextMeshPro用
 
 using static KMHH_TimeManager; //時間管理スクリプトを使う
 using static KMHH_CharaAnimationManager;
+using static KMHH_ScoreManager;//スコア管理スクリプトを使う
 
 public class KMHH_PlayerInputManager : MonoBehaviour
 {
@@ -13,13 +14,14 @@ public class KMHH_PlayerInputManager : MonoBehaviour
 
     public string suffixBodyPartsName;　//末尾にいれるパーツ
 
-    public Dictionary<string, int> bodyPartDic = new Dictionary<string, int>();
-
+    public static float countTime; //リセットまでの時間計測
 
     //デバッグ　正否文字表示
     public static GameObject Debug_AnserResultObj;
-    public TextMeshProUGUI Debug_AnserResultText;
+    public static TextMeshProUGUI Debug_AnserResultText;
 
+    public static float recordAnserTime; //ボタン押されたタイミングのanserTimeを記録
+    public static bool switchResetAnserResult = false; //リセットにいくためのスイッチ
     void Start()
     {
 
@@ -27,45 +29,86 @@ public class KMHH_PlayerInputManager : MonoBehaviour
         Debug_AnserResultText = Debug_AnserResultObj.GetComponentInChildren<TextMeshProUGUI>();
         Debug_AnserResultText = Debug_AnserResultObj.GetComponentInChildren<TextMeshProUGUI>();
     }
-    
-public void AnserResultCollect(){
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// 待機もどり処理まわし
+    /// </summary>
+    /// <returns></returns>   
+    void Update(){
+
+
+        if(switchResetAnserResult){
+            countTime += Time.deltaTime;
+
+            if(countTime>10.0f){
+                ResetAnserResult();
+            }
+        }
+    }
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// 正解んときの処理
+    /// </summary>
+    /// <returns></returns>   
+public static  void AnserResultCollect(){
     Debug_AnserResultText.text ="SEIKAI";
-    Invoke("ResetAnserResultText",1.0f);
+    KMHH_TimeManager.setEmotion(true);          //エモーションステート選びにいく
 
-    KMHH_TimeManager.switchQuestion = false;
+    KMHH_TimeManager.switchQuestion = false;　  //出題オフ
+
+    KMHH_ScoreManager.AddAnserResult(true);     //不正解で回答結果更新
+    switchResetAnserResult = true;              //Idle戻るまでの時間計測開始させる
 }
 
-public void AnserResultIncorrect(){
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// 不正解んときの処理
+    /// </summary>
+    /// <returns></returns> 
+public static void AnserResultIncorrect(){
     Debug_AnserResultText.text ="CHIGAU";
+    KMHH_TimeManager.setEmotion(false);　       //エモーションステート選びにいく
 
-    Invoke("ResetAnserResultText",1.0f);
-    KMHH_TimeManager.switchQuestion = false;
+    KMHH_TimeManager.switchQuestion = false;　  //出題オフ
+    
+    KMHH_ScoreManager.AddAnserResult(false);　  //不正解で回答結果更新
+    switchResetAnserResult = true;              //Idle戻るまでの時間計測開始させる
     
 }
-public void ResetAnserResultText(){
+
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// 回答後、待機に戻る
+    /// </summary>
+    /// <returns></returns> 
+public void ResetAnserResult(){
+    switchResetAnserResult = false;
+    countTime = 0.0f;
 
     Debug_AnserResultText.text ="";
     KMHH_TimeManager.setIdle();
 }
 
-
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
     /// <summary>
-    /// てすとてすとてすとボタン押されたときの成否判断処理
+    /// ボタン押されたときのanserTime
     /// </summary>
     /// <returns></returns>   
-    public void JudgeTest()   //外から左ボタンが押されたときに実行
-    {
+    public static float RecordAnserTime(){
+        KMHH_TimeManager.recordAnserTime = KMHH_TimeManager.anserTime; //時間管理スクリプトから回答経過時間を引っ張る
         
-            if(KMHH_TimeManager.questionStatus){
-            Debug.Log("てすと");
+        recordAnserTime = KMHH_TimeManager.recordAnserTime;　//代入
 
-            if(KMHH_TimeManager.switchQuestion){
-            KMHH_TimeManager.setIdle();
-            }
-
-        }
-
+        Debug.Log("押した時間："+ recordAnserTime);
+        return recordAnserTime;
     }
+
 
     /// <summary>
     /// 左ボタン押されたときの成否判断処理
@@ -78,7 +121,6 @@ public void ResetAnserResultText(){
 
         if(KMHH_TimeManager.questionStatus){
             if (KMHH_CharaAnimationManager.resultCollectAnser == "L"){
-
 
                 Debug.Log("せいかい");
                 AnserResultCollect();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; //テキスト使うなら必要
 using static KMHH_TimeManager; //時間管理スクリプトを使う
+using static KMHH_PlayerInputManager; //インプット管理スクリプトを使う
 
 /// <summary>
 ///スコア関係の管理
@@ -11,24 +12,17 @@ using static KMHH_TimeManager; //時間管理スクリプトを使う
 public class KMHH_ScoreManager : MonoBehaviour
 {
 
-    public  int comboCountNum = 0; //コンボを数える
-    const float baseScore = 100.0f; //ベースの計算スコア
+    public static int comboCountNum = 0; //コンボを数える
+    public static float baseScore = 100.0f; //ベースの計算スコア
     public static float totalScore = 0.0f;　//合計スコア
 
 
-    public Text comboText;　//コンボの表示
-    public Text scoreText;　//スコアの表示
+    public static  Text comboText;　//コンボの表示
+    public static  Text scoreText;　//スコアの表示
 
-    public float[] timeJudgeRange = new float[5]; //回答までの時間区分け
-    public float[] timeJudgeValue = new float[6];　//回答までの時間による係数
-
-    public CharacterTest at;
-
-    public bool successResult;
-
-    //テキストを上書いて、Great、Goodなどやってたが、本番ではPrefabごとに作るので不要
-//    private GameObject ctj;
-
+    public static float[] timeJudgeRange = new float[5]; //回答までの時間区分け
+    public static float[] timeJudgeValue = new float[6];　//回答までの時間による係数
+    public static float coefficient = 0.0f;//係数をいれる
 
     public static int maxCombo = 0;
     public static int scoreExcellent = 0;
@@ -37,7 +31,12 @@ public class KMHH_ScoreManager : MonoBehaviour
     public static int scoreNotGood = 0;
     public static int scoreBad = 0;
     public static int scoreMiss = 0;
+    public static float anserTimeRange;
 
+
+    //デバッグ
+    public  GameObject debugLookScoreValObj;
+    Text debug_LookScoreValText;
 
 
 ////////////////////////////////////////////////////////////////////
@@ -50,19 +49,46 @@ public class KMHH_ScoreManager : MonoBehaviour
     void Start()
     {
 
+    debugLookScoreValObj = GameObject.Find("Debug_LookScoreVal");
+    debug_LookScoreValText = debugLookScoreValObj.GetComponentInChildren<Text>();
+
+
+        timeJudgeRange[0] = 1.0f; // 正解までの秒数
+        timeJudgeRange[1] = 1.5f; //
+        timeJudgeRange[2] = 2.0f; //
+        timeJudgeRange[3] = 3.0f; //
+        timeJudgeRange[4] = 4.0f; //
+
+        timeJudgeValue[0] = 1.5f; //　正解したときの数値補正
+        timeJudgeValue[1] = 1.2f; //
+        timeJudgeValue[2] = 1.1f; //
+        timeJudgeValue[3] = 1.0f; //
+        timeJudgeValue[4] = 0.5f; //
+        timeJudgeValue[5] = 0.0f; //
+
+
         //コンボカウントしてるオブジェクトと、スコア表示のオブジェクトの取得
         GameObject comboTextObj = GameObject.Find("ui_ComboText");
         GameObject scoreTextObj = GameObject.Find("ui_TotalScore");
 
         //テキスト乗っ取り
         comboText = comboTextObj.GetComponentInChildren<Text>();
-        scoreText = scoreTextObj.GetComponentInChildren<Text>();
-
-        Debug.Log(comboText);
-        Debug.Log(scoreText);        
+        scoreText = scoreTextObj.GetComponentInChildren<Text>();   
         
-        scoreText.text = "Score:0000";
-        comboText.text = "00Combo";
+        scoreText.text = "Score:";
+        comboText.text = "Combo";
+
+        debug_LookScoreValText.text =
+            "recordAnserTime :" + anserTimeRange.ToString("f2") + "\n" +
+            "totalScore :" + totalScore + "\n" +
+            "comboCountNum :" + comboCountNum + "\n" +
+            "maxCombo :" + maxCombo + "\n" +
+            "scoreExcellent :" + scoreExcellent + "\n" +
+            "scoreGreat :" + scoreGreat + "\n" +
+            "scoreGood :" + scoreGood + "\n" +
+            "scoreNotGood :" + scoreNotGood + "\n" +
+            "scoreBad :" + scoreBad + "\n" +
+            "scoreMiss :" + scoreMiss + "\n";
     }
 
 ////////////////////////////////////////////////////////////////////
@@ -87,7 +113,19 @@ public class KMHH_ScoreManager : MonoBehaviour
             scoreBad = 0;
             scoreMiss = 0;  
 
-        }       
+        }
+        debug_LookScoreValText.text =
+            "recordAnserTime :" + anserTimeRange.ToString("f2") + "\n" +
+            "totalScore :" + totalScore + "\n" +
+            "comboCountNum :" + comboCountNum + "\n" +
+            "maxCombo :" + maxCombo + "\n" +
+            "scoreExcellent :" + scoreExcellent + "\n" +
+            "scoreGreat :" + scoreGreat + "\n" +
+            "scoreGood :" + scoreGood + "\n" +
+            "scoreNotGood :" + scoreNotGood + "\n" +
+            "scoreBad :" + scoreBad + "\n" +
+            "scoreMiss :" + scoreMiss + "\n";
+
     }
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -97,36 +135,31 @@ public class KMHH_ScoreManager : MonoBehaviour
     ///スコアとコンボ数の表示更新などを行う
     /// </summary>
     /// <returns>trueかfalseを受け取る</returns>
-    public void AddAnserResult(bool anser)
+    public static void AddAnserResult(bool anserResult)
      {
-        //★　float anserTimeRange =  //回答までにかかった時間
-/*
-            if (anser) //回答が正解だったら
-            {
-                comboCountNum++;　　//コンボ加算
+            anserTimeRange = (KMHH_PlayerInputManager.RecordAnserTime());
 
-                if(comboCountNum > maxCombo)　　//もしコンボが最大だったら
-                {
-                    maxCombo = comboCountNum; //マックスコンボの更新
+            if(anserResult){
+                if ((anserTimeRange <= timeJudgeRange[3])){  //成功だが3秒以上かかっててもだめ
+                comboCountNum++;　　//3秒以内はコンボ加算
                 }
-
-            }
-            else if ((anser)&&(anserTimeRange > timeJudgeRange[3]))  //成功だが3秒以上かかっててもだめ
-            {
-            comboCountNum = 0;
-
-            }
-            else　//回答が不正解だったらコンボリセット
+                else{
+                comboCountNum = 1;
+                }
+            }else　//回答が不正解だったらコンボリセット
             {
                 comboCountNum = 0;
-
             }
-           
-        scoreText.text = "Score:" + GetScore(anserTimeRange);
-        comboText.text = comboCountNum.ToString() + "Combo";
-        //Debug.Log(comboCountNum + "コンボ");
-        //Debug.Log("スコア"+GetScore());
-        */ 
+
+            if(comboCountNum >= maxCombo)　　//もしコンボが最大だったら
+            {
+                maxCombo = comboCountNum; //マックスコンボの更新
+            }
+
+            GetScore(anserResult);
+
+        scoreText.text = "Score:" + totalScore;
+        comboText.text = comboCountNum.ToString() + " Combo";
     }
 
 ////////////////////////////////////////////////////////////////////
@@ -135,41 +168,38 @@ public class KMHH_ScoreManager : MonoBehaviour
     /// 現状でのスコアをゲッツ
     /// </summary>
     /// <returns>コンボによる倍率をかけた値を返す</returns>
-    public float GetScore(float pastAnserTime)
+    public static void GetScore(bool anserResult)
     {
 
-        //係数をいれる
-        float coefficient = 0.0f;
-
-       if ((pastAnserTime <= timeJudgeRange[0]) && (successResult))
+       if ((anserTimeRange <= timeJudgeRange[0]) && (anserResult))
         {
             coefficient = timeJudgeValue[0];
             Debug.Log("Excellent!" + timeJudgeValue[0]);
             scoreExcellent += 1;
 
         }
-       else if ((pastAnserTime > timeJudgeRange[0]) && (pastAnserTime <= timeJudgeRange[1]) && (successResult))
+       else if ((anserTimeRange > timeJudgeRange[0]) && (anserTimeRange <= timeJudgeRange[1]) && (anserResult))
         {
             coefficient = timeJudgeValue[1];
             Debug.Log("Great" + timeJudgeValue[1]);
             scoreGreat += 1;
 
         }
-        else if ((pastAnserTime > timeJudgeRange[1]) && (pastAnserTime <= timeJudgeRange[2]) && (successResult))
+        else if ((anserTimeRange > timeJudgeRange[1]) && (anserTimeRange <= timeJudgeRange[2]) && (anserResult))
         {
             coefficient = timeJudgeValue[2];
             Debug.Log("Good" + timeJudgeValue[2]);
             scoreGood += 1;
 
         }
-        else if ((pastAnserTime > timeJudgeRange[2]) && (pastAnserTime <= timeJudgeRange[3]) && (successResult))
+        else if ((anserTimeRange > timeJudgeRange[2]) && (anserTimeRange <= timeJudgeRange[3]) && (anserResult))
         {
             coefficient = timeJudgeValue[3];
             Debug.Log("NotGood");
             scoreNotGood += 1;
 
         }
-        else if ((pastAnserTime > timeJudgeRange[3]) && (pastAnserTime <= timeJudgeRange[4]) && (successResult))
+        else if ((anserTimeRange > timeJudgeRange[3]) && (anserTimeRange <= timeJudgeRange[4]) && (anserResult))
         {
             coefficient = timeJudgeValue[4];
             Debug.Log("Bad");
@@ -178,27 +208,23 @@ public class KMHH_ScoreManager : MonoBehaviour
         }
 
         //回答時間が指定時間より長かったら
-        else if (pastAnserTime > timeJudgeRange[4])
+        else if (anserTimeRange > timeJudgeRange[4])
         {
             coefficient = timeJudgeValue[5];
 
             Debug.Log("miss");
-            // // // // ctj.GetComponent<TextMesh>().text = "miss";
-            //コンボ数も降り出し
+            
             comboCountNum = 0;
 
             scoreMiss += 1;
 
         }
-        at.endTime = 0;
 
         if (comboCountNum == 0){
-            return totalScore;
         }
         else
         {
             totalScore += baseScore * coefficient * comboCountNum;
-            return totalScore;
 
         }
     }

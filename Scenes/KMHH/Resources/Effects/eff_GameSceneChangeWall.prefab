@@ -47,7 +47,6 @@ GameObject:
   - component: {fileID: 1137144318710964758}
   - component: {fileID: 4380393629250355774}
   - component: {fileID: 1673226164155855095}
-  - component: {fileID: 2955642286034694163}
   m_Layer: 9
   m_Name: eff_SceneChange
   m_TagString: Untagged
@@ -116,22 +115,3 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!95 &2955642286034694163
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3622355662383496893}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 711d7847c1f165a4f8d0a7ac70ad9246, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0

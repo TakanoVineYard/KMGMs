@@ -5,6 +5,7 @@ using UnityEngine.UI; //テキスト使うなら必要？
 
 //using static KMHH_ScoreManager; //スコアスクリプトを使う
 //using static KMHH_CharaAnimationManager; //キャラのアニメーション管理を使う
+using static KMHH_PlayerInputManager;
 
 using UnityEngine.SceneManagement; //シーン切り替え
 
@@ -20,7 +21,9 @@ public class KMHH_TimeManager : MonoBehaviour
     static float gameTimePast = 0.0f; //時間の経過
     static int  gameTimePastInt = 0;  //時間の経過のInt化
     static float gameFinishTime = 0.0f; //ゲーム終了時の時間を記録
-    static float anserTime = 0.0f; //回答時のカレントタイム。
+    public static float anserTime = 0.0f; //回答時のカレントタイム。
+    public static float recordAnserTime = 0.0f; //回答時のカレントタイム。
+    
    
     static float idleTime = 0.0f; //待機時のカレントタイム。
    
@@ -99,7 +102,7 @@ public class KMHH_TimeManager : MonoBehaviour
         //KMHH_CharaAnimationManager kmhh_CAM = new KMHH_CharaAnimationManager();
 
     }
-
+////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
     /// <summary>
     /// ゲームの時間進行いろいろ。カウントダウンもやっちゃう 
@@ -124,7 +127,6 @@ public class KMHH_TimeManager : MonoBehaviour
         getDeltaTime += Time.deltaTime;
 
 
-////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
         //カウントダウン中
@@ -192,7 +194,6 @@ public class KMHH_TimeManager : MonoBehaviour
         }
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
         //ゲーム開始。ゲームが終わってないとき,ゲーム中の時間を記録
         if ((gameStart == true)&&(gameFinish == false))
         {
@@ -229,16 +230,17 @@ public class KMHH_TimeManager : MonoBehaviour
             Debug.Log("待機スパンすぎた");
             setQuestion();
 
-        }
-        if(anserTime > kmhhQuestionSpan){
-            Debug.Log("回答スパンすぎた");
-            setIdle();
+            }
+            if(anserTime > kmhhQuestionSpan){
+                Debug.Log("回答スパンすぎた");
+                if(questionStatus){
+                    setTimeOver();
+                }
+                //setIdle();
+
+            }
 
         }
-
-
-        }
-////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
         //ゲームが終わったとき,終了の処理        
@@ -248,7 +250,6 @@ public class KMHH_TimeManager : MonoBehaviour
 
         }
     } //Update()ここまで
-////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -265,6 +266,7 @@ public class KMHH_TimeManager : MonoBehaviour
         KMHH_CharaAnimationManager.KMHH_CharaAnimator.SetBool("questionState",true); 
 
     }
+////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////   
     /// <summary>
     /// カウントダウン全部消す 
@@ -291,8 +293,9 @@ public class KMHH_TimeManager : MonoBehaviour
             Debug.Log("ゲームとまった");
 
             GameSceneChangeWallObj.SetActive (true);
-            
-        Invoke("DerayGameTitleLoadRun",5.0f);   // カウントダウン全部消す 
+            setFinish();
+        
+        Invoke("DerayGameTitleLoadRun",4.0f);   // カウントダウン全部消す 
     }
     public void DerayGameTitleLoadRun()
     {
@@ -300,10 +303,24 @@ public class KMHH_TimeManager : MonoBehaviour
     }
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
-
+    /// <summary>
+    /// タイムオーバー処理
+    /// </summary>
+    /// <returns></returns> 
+    public static void setTimeOver(){
+        KMHH_ScoreManager.comboCountNum = 0; //コンボカウントのリセット　時間経過によるもの
+        KMHH_PlayerInputManager.AnserResultIncorrect();
+        anserTime = 0.0f;
+    
+    }
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// クエスチョンステートにいく
+    /// </summary>
+    /// <returns></returns> 
     public static void setQuestion()
     {
-        
         idleTime = 0.0f;
         questionStatus = true;
 
@@ -315,15 +332,16 @@ public class KMHH_TimeManager : MonoBehaviour
         KMHH_CharaAnimationManager.ChangeCharaState(); //キャラのステート変えるやつ
         questionNumOfTimes = questionNumOfTimes + 1;　//出題回数増やす
     }
-
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// 待機にいく
+    /// </summary>
+    /// <returns></returns> 
     public static void setIdle()
-    
     {   
         anserTime = 0.0f;
         questionStatus = false;
-
         switchIdle = true;
         switchQuestion = false;
 
@@ -331,7 +349,36 @@ public class KMHH_TimeManager : MonoBehaviour
         KMHH_CharaAnimationManager.ChangeCharaStateToIdle(); //キャラのステート変えるやつ　待機
 
     }
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// エモーションステートにいく
+    /// </summary>
+    /// <returns>成否で分岐</returns> 
+    public static void setEmotion(bool anserResult)
+    {
+        questionStatus = false;
+        switchIdle = false;
+        switchQuestion = false;
+        
+        KMHH_CharaAnimationManager.ChangeCharaStateToEmotion(anserResult); //キャラのステート変えるやつ　待機
 
+    }
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// フィニッシュステートにいく
+    /// </summary>
+    /// <returns></returns> 
+    public static void setFinish()
+    {   
+        anserTime = 0.0f;
+        questionStatus = false;
+        switchIdle = false;
+        switchQuestion = false;
+        KMHH_CharaAnimationManager.ChangeCharaStateToFinish(); //キャラのステート変えるやつ　待機
+
+    }
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 }
