@@ -213,7 +213,7 @@ public class KMHH_ScoreManager : MonoBehaviour
             coefficient = timeJudgeValue[5];
 
             Debug.Log("miss");
-            
+
             comboCountNum = 0;
 
             scoreMiss += 1;
@@ -228,6 +228,8 @@ public class KMHH_ScoreManager : MonoBehaviour
 
         }
     }
+
+
 
 
 }

@@ -50,36 +50,40 @@ public class KMHH_ScoreResultManager : MonoBehaviour
         resultScoreBad = resultScoreBadObj.GetComponent<TextMeshProUGUI>();
         resultScoreMiss = resultScoreMissObj.GetComponent<TextMeshProUGUI>();
 
-        resultMaxComboText.text =  "COMBO:"+ KMHH_ScoreManager.maxCombo.ToString();
-        resultScoreText.text = "SCORE:" + KMHH_ScoreManager.totalScore.ToString();
-        resultScoreExcellent.text = "Excellent:" + KMHH_ScoreManager.scoreExcellent.ToString();
-        resultScoreGreat.text = "Great:" + KMHH_ScoreManager.scoreGreat.ToString();
-        resultScoreGood.text = "Good:" + KMHH_ScoreManager.scoreGood.ToString();
-        resultScoreNotGood.text = "NotGood:" + KMHH_ScoreManager.scoreNotGood.ToString();
-        resultScoreBad.text = "Bad:" + KMHH_ScoreManager.scoreBad.ToString();
-        resultScoreMiss.text = "Miss:" + KMHH_ScoreManager.scoreMiss.ToString();
+        resultMaxComboText.text =  "<bounce>COMBO:"+ KMHH_ScoreManager.maxCombo.ToString();
+        resultScoreText.text = "<bounce>SCORE:" + KMHH_ScoreManager.totalScore.ToString();
+        resultScoreExcellent.text = "<bounce>Excellent:" + KMHH_ScoreManager.scoreExcellent.ToString();
+        resultScoreGreat.text = "<bounce>Great:" + KMHH_ScoreManager.scoreGreat.ToString();
+        resultScoreGood.text = "<bounce>Good:" + KMHH_ScoreManager.scoreGood.ToString();
+        resultScoreNotGood.text = "<bounce>NotGood:" + KMHH_ScoreManager.scoreNotGood.ToString();
+        resultScoreBad.text = "<bounce>Bad:" + KMHH_ScoreManager.scoreBad.ToString();
+        resultScoreMiss.text = "<bounce>Miss:" + KMHH_ScoreManager.scoreMiss.ToString();
 
     }
 
-// Update is called once per frame
-void Update()
+
+    ////////
+    public void BackToKMGMs()
     {
-        
+        Debug.Log("hogeOption");
+        Invoke("DerayMoveKMGMs", 1.0f);
     }
 
-    public void ShowResult()
+    public void ContinueKMHH()
     {
-        
+        Debug.Log("hoge");
+        Invoke("DerayMoveKMHH", 1.0f);
+    }
+    public void DerayMoveKMHH()
+    {
+
+            SceneManager.LoadScene("KMHH");
     }
 
-    public void TapToBackTitleButton()
+    public void DerayMoveKMGMs()
     {
-        Invoke("DerayGameLoadRun", 1);
-    }
 
-    public void DerayGameLoadRun()
-    {
-        SceneManager.LoadScene("MainTitle");
+            SceneManager.LoadScene("KMGMs");
     }
 
 }

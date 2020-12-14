@@ -37,7 +37,6 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     public static GameObject indicateBodyPartRsideLeg;
 
 
-
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
     /// <summary>
@@ -66,13 +65,15 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
 
     }
 
+
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
     /// <summary>
     ///アニメーションステートを変える
     /// </summary>
     /// <returns></returns> 
-    static void ChangeQuestionBodyParts()
+    public static void ChangeQuestionBodyParts()
     {
         randomBodyPartNum = UnityEngine.Random.Range(0, 4);　　//0～4用意した分でランダム数値取り出し
         indicateBodyPartsSpeechBubble.SetActive(true); //　吹き出し出す
@@ -115,11 +116,11 @@ public class KMHH_CharaAnimationManager : MonoBehaviour
     public static void hideBodyParts()
     {
         indicateBodyPartsSpeechBubble.SetActive(true); //　吹き出し出す
-                    indicateBodyPartEye.SetActive(false);
-                    indicateBodyPartLsideHand.SetActive(false);
-                    indicateBodyPartRsideHand.SetActive(false);
-                    indicateBodyPartLsideLeg.SetActive(false);
-                    indicateBodyPartRsideLeg.SetActive(false);
+        indicateBodyPartEye.SetActive(false);
+        indicateBodyPartLsideHand.SetActive(false);
+        indicateBodyPartRsideHand.SetActive(false);
+        indicateBodyPartLsideLeg.SetActive(false);
+        indicateBodyPartRsideLeg.SetActive(false);
     }
 
 

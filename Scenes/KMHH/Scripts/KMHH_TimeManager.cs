@@ -9,29 +9,32 @@ using static KMHH_PlayerInputManager;
 
 using UnityEngine.SceneManagement; //シーン切り替え
 
+
 /// <summary>
 /// ゲーム内の時間にまつわる操作を管理する
 /// </summary>
 /// <returns></returns> 
 public class KMHH_TimeManager : MonoBehaviour
 {
-    float getDeltaTime = 0; //時間経過取得の大元
-    float gameCurrentTime = 0.0f; //現在の時間
+
+    public bool switchStartMethod = true;
+    public static float getDeltaTime = 0.0f; //時間経過取得の大元
+    public static float gameCurrentTime = 0.0f; //現在の時間
     public float gameStandbyTime = 1.0f; //スタンバイの時間
-    static float gameTimePast = 0.0f; //時間の経過
-    static int  gameTimePastInt = 0;  //時間の経過のInt化
-    static float gameFinishTime = 0.0f; //ゲーム終了時の時間を記録
+     float gameTimePast = 0.0f; //時間の経過
+     int  gameTimePastInt = 0;  //時間の経過のInt化
+     float gameFinishTime = 0.0f; //ゲーム終了時の時間を記録
     public static float anserTime = 0.0f; //回答時のカレントタイム。
     public static float recordAnserTime = 0.0f; //回答時のカレントタイム。
     
    
-    static float idleTime = 0.0f; //待機時のカレントタイム。
+     float idleTime = 0.0f; //待機時のカレントタイム。
    
 
     public static bool gameStart = false; //ゲームがスタートしているかの判定
     public static bool gameFinish = false; //ゲームが終了しているかの判定
 
-    public static float editTimeScale = 1.0f;
+    public  float editTimeScale = 1.0f;
 
     public static bool questionStatus = false; //出題状態かどうか
     public float kmhhQuestionSpan　= 5.0f;  //出題時間のスパン
@@ -74,7 +77,7 @@ public class KMHH_TimeManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-     
+        getDeltaTime = 0.0f;
         Time.timeScale = 1.0f;
         questionNumOfTimes = 0;
 
@@ -86,7 +89,6 @@ public class KMHH_TimeManager : MonoBehaviour
         countDownEffObj_Fin = GameObject.Find("eff_KMHH_CountDown_Finish");
         GameSceneChangeWallObj = GameObject.Find("eff_GameSceneChangeWall");
 
-        getDeltaTime = 0.0f;
 
         upDateGameTimerObj = GameObject.Find("ui_GameTimer");　//ゲーム時間経過用オブジェクト拾ってくるぜ  
            
@@ -123,6 +125,37 @@ public class KMHH_TimeManager : MonoBehaviour
         "アイドルのスパン" + kmhhIdleSpan  + "\n" +
         "待機スイッチ:"+ switchIdle + "\n"+
         "待機時間" + idleTime.ToString("f2")  + "\n";
+///////////////////////////////////////////////////////////////////
+
+        if((switchStartMethod==true)&&(gameFinish==false)){
+            getDeltaTime = 0.0f;
+            switchStartMethod = false;
+            
+            Time.timeScale = 1.0f;
+            questionNumOfTimes = 0;
+
+
+            countDownEffObj_3 = GameObject.Find("eff_KMHH_CountDown_3");
+            countDownEffObj_2 = GameObject.Find("eff_KMHH_CountDown_2");
+            countDownEffObj_1 = GameObject.Find("eff_KMHH_CountDown_1");
+            countDownEffObj_0 = GameObject.Find("eff_KMHH_CountDown_Start");
+            countDownEffObj_Fin = GameObject.Find("eff_KMHH_CountDown_Finish");
+            GameSceneChangeWallObj = GameObject.Find("eff_GameSceneChangeWall");
+
+
+            upDateGameTimerObj = GameObject.Find("ui_GameTimer");　//ゲーム時間経過用オブジェクト拾ってくるぜ  
+                
+            upDateGameTimerText.text = gameSetTime.ToString(); //　時間制限をテキスト更新
+
+
+            debugGameTimerObj　= GameObject.Find("Debug_CountTimer");
+
+            debugGameTimeText = debugGameTimerObj.GetComponentInChildren<Text>();
+
+            //kmhh_CAM_Obj = GameObject.Find("KMHH_CharaAnimationManager_Obj");
+
+            //KMHH_CharaAnimationManager kmhh_CAM = new KMHH_CharaAnimationManager();
+        }
 
         getDeltaTime += Time.deltaTime;
 
@@ -133,8 +166,11 @@ public class KMHH_TimeManager : MonoBehaviour
         if ((gameStart == false)&&(gameFinish == false))
         {
             if(getDeltaTime < 0.1f){
+                gameParamReset();
                 if(KMHH_CharaAnimationManager.KMHH_CharaAnimator.GetBool("goToIdle") == true){
                     setIdle();
+                    KMHH_CharaAnimationManager.hideBodyParts();
+                    KMHH_CharaAnimationManager.ChangeQuestionBodyParts();
                     KMHH_CharaAnimationManager.KMHH_CharaAnimator.SetBool("goToIdle",false);
                 }
                 countDownEffObj_3.SetActive (false);            
@@ -226,9 +262,9 @@ public class KMHH_TimeManager : MonoBehaviour
                 return;
             }
 
-        if(idleTime > kmhhIdleSpan){
-            Debug.Log("待機スパンすぎた");
-            setQuestion();
+            if(idleTime > kmhhIdleSpan){
+                Debug.Log("待機スパンすぎた");
+                setQuestion();
 
             }
             if(anserTime > kmhhQuestionSpan){
@@ -289,7 +325,7 @@ public class KMHH_TimeManager : MonoBehaviour
     
             gameStart = false;
             gameFinish = true;
-
+            switchStartMethod = true;
             Debug.Log("ゲームとまった");
 
             GameSceneChangeWallObj.SetActive (true);
@@ -307,10 +343,13 @@ public class KMHH_TimeManager : MonoBehaviour
     /// タイムオーバー処理
     /// </summary>
     /// <returns></returns> 
-    public static void setTimeOver(){
+    public void setTimeOver(){
         KMHH_ScoreManager.comboCountNum = 0; //コンボカウントのリセット　時間経過によるもの
         KMHH_PlayerInputManager.AnserResultIncorrect();
         anserTime = 0.0f;
+        questionStatus = false;
+        switchQuestion = false;
+        switchIdle = false;
     
     }
 ////////////////////////////////////////////////////////////////////
@@ -319,7 +358,7 @@ public class KMHH_TimeManager : MonoBehaviour
     /// クエスチョンステートにいく
     /// </summary>
     /// <returns></returns> 
-    public static void setQuestion()
+    public void setQuestion()
     {
         idleTime = 0.0f;
         questionStatus = true;
@@ -370,7 +409,7 @@ public class KMHH_TimeManager : MonoBehaviour
     /// フィニッシュステートにいく
     /// </summary>
     /// <returns></returns> 
-    public static void setFinish()
+    public  void setFinish()
     {   
         anserTime = 0.0f;
         questionStatus = false;
@@ -381,4 +420,31 @@ public class KMHH_TimeManager : MonoBehaviour
     }
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// ゲーム開始時にリセット
+    /// </summary>
+    /// <returns></returns> 
+    public void gameParamReset()
+    {
+        gameCurrentTime = 0.0f;
+        questionNumOfTimes = 0;
+        getDeltaTime = 0.0f;
+        gameStart = false;
+        gameFinish = false;
+        anserTime = 0.0f;
+        questionStatus = false;
+        switchIdle = false;
+        switchQuestion = false;
+
+    }
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+public void reRoadKMHH()
+{
+    SceneManager.LoadScene (SceneManager.GetActiveScene().name);
+
+}
+
+
 }

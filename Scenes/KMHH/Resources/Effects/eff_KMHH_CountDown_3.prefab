@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1845578756674688907}
   - component: {fileID: 3527420595117027141}
   - component: {fileID: 1299570379614226733}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: eff_KMHH_CountDown_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,8 +94,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 150
-  m_fontSizeBase: 150
+  m_fontSize: 250
+  m_fontSizeBase: 250
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

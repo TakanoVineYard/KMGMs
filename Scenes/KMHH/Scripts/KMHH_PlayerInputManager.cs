@@ -86,7 +86,7 @@ public static void AnserResultIncorrect(){
     /// 回答後、待機に戻る
     /// </summary>
     /// <returns></returns> 
-public void ResetAnserResult(){
+public static void ResetAnserResult(){
     switchResetAnserResult = false;
     countTime = 0.0f;
 
